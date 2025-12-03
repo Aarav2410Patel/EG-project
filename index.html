@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,10 @@
     <title>Autonomous Funnel-Dispenser Rover</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -14,13 +18,90 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1729 100%);
+            font-family: 'Rajdhani', sans-serif;
+            background: #000;
             color: #e0e6ed;
             overflow-x: hidden;
+            position: relative;
         }
 
+        /* Animated Grid Background */
+        .grid-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
 
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Circuit Lines Animation */
+        .circuit-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.3;
+        }
+
+        .circuit-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            height: 2px;
+            width: 100%;
+            animation: circuitFlow 4s linear infinite;
+        }
+
+        .circuit-line:nth-child(1) { top: 20%; animation-delay: 0s; }
+        .circuit-line:nth-child(2) { top: 50%; animation-delay: 1s; }
+        .circuit-line:nth-child(3) { top: 80%; animation-delay: 2s; }
+
+        @keyframes circuitFlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: float 15s infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
 
         .hero {
             min-height: 100vh;
@@ -30,73 +111,181 @@
             justify-content: center;
             padding: 2rem;
             position: relative;
-            overflow: hidden;
+            z-index: 2;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
+        /* Glitch Effect Title */
         h1 {
-            font-size: clamp(2rem, 5vw, 4rem);
-            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
             text-align: center;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+            background: linear-gradient(135deg, #00f5ff 0%, #3b82f6 50%, #8b5cf6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             opacity: 0;
             transform: translateY(-30px);
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        h1::before {
+            content: 'AUTONOMOUS FUNNEL-DISPENSER ROVER';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #00f5ff 0%, #3b82f6 50%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glitch 3s infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-2px, 2px); }
+            94% { transform: translate(2px, -2px); }
+            96% { transform: translate(-2px, -2px); }
         }
 
         .subtitle {
-            font-size: clamp(1rem, 2vw, 1.5rem);
-            color: #9ca3af;
+            font-size: clamp(1rem, 2.5vw, 1.8rem);
+            color: #00f5ff;
             text-align: center;
             margin-bottom: 3rem;
             opacity: 0;
             transform: translateY(-20px);
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
 
+        /* Tech Frame for 3D Model */
         #canvas-container {
             width: 90%;
-            max-width: 600px;
-            height: 400px;
+            max-width: 700px;
+            height: 450px;
             margin: 2rem auto;
-            border-radius: 20px;
+            border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
             opacity: 0;
             transform: scale(0.9);
-            position: relative;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #3b82f6;
+            box-shadow: 
+                0 0 20px rgba(59, 130, 246, 0.5),
+                inset 0 0 20px rgba(59, 130, 246, 0.1);
         }
 
-        #canvas-container:hover {
-            transform: scale(1.02);
-            box-shadow: 0 25px 80px rgba(59, 130, 246, 0.5);
+        #canvas-container::before,
+        #canvas-container::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #00f5ff;
+            z-index: 10;
+        }
+
+        #canvas-container::before {
+            top: -2px;
+            left: -2px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        #canvas-container::after {
+            bottom: -2px;
+            right: -2px;
+            border-left: none;
+            border-top: none;
+        }
+
+        /* Corner Brackets */
+        .corner-bracket {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #00f5ff;
+            z-index: 10;
+        }
+
+        .corner-bracket.top-right {
+            top: -2px;
+            right: -2px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-bracket.bottom-left {
+            bottom: -2px;
+            left: -2px;
+            border-right: none;
+            border-top: none;
+        }
+
+        /* Scanning Line Effect */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00f5ff, transparent);
+            animation: scan 3s linear infinite;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* HUD Elements */
+        .hud-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            color: #00f5ff;
+            z-index: 10;
+            text-align: right;
+            pointer-events: none;
+        }
+
+        .hud-line {
+            opacity: 0.8;
+            margin: 3px 0;
         }
 
         section {
-            max-width: 1200px;
-            margin: 4rem auto;
+            max-width: 1400px;
+            margin: 6rem auto;
             padding: 2rem;
+            position: relative;
+            z-index: 2;
         }
 
         h2 {
-            font-size: clamp(1.8rem, 4vw, 3rem);
-            margin-bottom: 2rem;
-            color: #3b82f6;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 3rem;
+            color: #00f5ff;
             position: relative;
-            padding-left: 1.5rem;
+            padding-left: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 900;
         }
 
         h2::before {
@@ -105,44 +294,105 @@
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            width: 5px;
-            height: 80%;
-            background: linear-gradient(180deg, #3b82f6, #60a5fa);
-            border-radius: 3px;
+            width: 8px;
+            height: 100%;
+            background: linear-gradient(180deg, #00f5ff, #3b82f6);
+            box-shadow: 0 0 10px #00f5ff;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 4px;
+            background: #00f5ff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00f5ff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+            50% { opacity: 0.5; transform: translateY(-50%) scale(1.5); }
         }
 
         h3 {
-            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-            color: #60a5fa;
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+            color: #3b82f6;
             margin-top: 2rem;
             margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
         }
 
         p, li {
-            line-height: 1.8;
+            line-height: 1.9;
             color: #d1d5db;
-            font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+            font-size: clamp(1rem, 1.5vw, 1.15rem);
+            font-weight: 400;
         }
 
         .details-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
         }
 
+        /* Tech Card Design */
         .detail-card {
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 15px;
-            padding: 2rem;
+            background: rgba(10, 14, 39, 0.8);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 0;
+            padding: 2.5rem;
             backdrop-filter: blur(10px);
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .detail-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .detail-card:hover::before {
+            left: 100%;
         }
 
         .detail-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-10px);
+            border-color: #00f5ff;
+            box-shadow: 
+                0 10px 40px rgba(59, 130, 246, 0.4),
+                inset 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Card Corner Indicators */
+        .detail-card::after {
+            content: '▸';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #3b82f6;
+            font-size: 1.5rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .detail-card:hover::after {
+            opacity: 1;
         }
 
         ul {
@@ -151,55 +401,108 @@
         }
 
         ul li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
+            padding: 0.8rem 0;
+            padding-left: 2rem;
             position: relative;
+            transition: transform 0.3s, color 0.3s;
         }
 
         ul li::before {
-            content: '▹';
+            content: '◆';
             position: absolute;
             left: 0;
             color: #3b82f6;
             font-weight: bold;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        ul li:hover {
+            transform: translateX(10px);
+            color: #00f5ff;
+        }
+
+        ul li:hover::before {
+            color: #00f5ff;
+            transform: scale(1.3);
         }
 
         .gallery {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
             margin-top: 2rem;
         }
 
         .gallery-item {
             aspect-ratio: 16/9;
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 197, 253, 0.1));
-            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(0, 245, 255, 0.1));
+            border: 2px solid rgba(59, 130, 246, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .gallery-item::before {
             content: '📷';
-            font-size: 3rem;
-            opacity: 0.3;
+            font-size: 4rem;
+            opacity: 0.2;
+            filter: grayscale(1);
+            transition: all 0.3s;
+        }
+
+        .gallery-item::after {
+            content: 'IMAGE PLACEHOLDER';
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.7rem;
+            color: #3b82f6;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
         .gallery-item:hover {
             transform: scale(1.05);
-            border-color: rgba(59, 130, 246, 0.6);
+            border-color: #00f5ff;
+            box-shadow: 0 10px 40px rgba(0, 245, 255, 0.4);
+        }
+
+        .gallery-item:hover::before {
+            opacity: 0.4;
+            transform: scale(1.2);
+        }
+
+        .gallery-item:hover::after {
+            opacity: 1;
         }
 
         footer {
-            background: rgba(15, 23, 42, 0.8);
-            padding: 3rem 2rem;
-            margin-top: 4rem;
-            border-top: 1px solid rgba(59, 130, 246, 0.2);
+            background: rgba(5, 8, 20, 0.95);
+            padding: 4rem 2rem;
+            margin-top: 6rem;
+            border-top: 2px solid #3b82f6;
+            position: relative;
+            z-index: 2;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00f5ff, transparent);
+            animation: footerGlow 3s infinite;
+        }
+
+        @keyframes footerGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
 
         .footer-content {
@@ -213,55 +516,69 @@
 
         .social-links {
             display: flex;
-            gap: 1.5rem;
+            gap: 2rem;
         }
 
         .social-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            border-radius: 0;
             background: rgba(59, 130, 246, 0.1);
-            border: 2px solid rgba(59, 130, 246, 0.3);
+            border: 2px solid #3b82f6;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            transition: all 0.3s ease;
+            font-size: 1.8rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-icon::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0, 245, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .social-icon:hover::before {
+            width: 200%;
+            height: 200%;
         }
 
         .social-icon:hover {
-            background: rgba(59, 130, 246, 0.3);
-            border-color: #3b82f6;
-            transform: translateY(-3px);
+            border-color: #00f5ff;
+            transform: translateY(-5px) rotate(5deg);
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.5);
         }
 
         .credits {
             text-align: center;
             color: #9ca3af;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            font-family: 'Orbitron', sans-serif;
         }
 
-        @media (max-width: 768px) {
-            #canvas-container {
-                height: 300px;
-            }
-
-            .details-grid {
-                grid-template-columns: 1fr;
-            }
-
-            h2::before {
-                height: 60%;
-            }
+        .credits strong {
+            color: #00f5ff;
+            font-size: 1.3rem;
+            letter-spacing: 2px;
         }
 
         .scroll-indicator {
             position: absolute;
-            bottom: 2rem;
+            bottom: 3rem;
             left: 50%;
             transform: translateX(-50%);
             animation: bounce 2s infinite;
+            z-index: 10;
         }
 
         @keyframes bounce {
@@ -269,79 +586,160 @@
                 transform: translateX(-50%) translateY(0);
             }
             40% {
-                transform: translateX(-50%) translateY(-10px);
+                transform: translateX(-50%) translateY(-15px);
             }
             60% {
-                transform: translateX(-50%) translateY(-5px);
+                transform: translateX(-50%) translateY(-7px);
             }
         }
 
         .scroll-indicator::after {
-            content: '↓';
-            font-size: 2rem;
-            color: #3b82f6;
-            opacity: 0.6;
+            content: '▼';
+            font-size: 2.5rem;
+            color: #00f5ff;
+            opacity: 0.8;
+            text-shadow: 0 0 10px #00f5ff;
         }
 
+        /* Color Legend with Tech Style */
         .color-legend {
-            max-width: 800px;
-            margin: 2rem auto 0;
-            padding: 1.5rem;
-            background: rgba(30, 41, 59, 0.5);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            max-width: 900px;
+            margin: 3rem auto 0;
+            padding: 2rem;
+            background: rgba(10, 14, 39, 0.9);
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            backdrop-filter: blur(15px);
+            position: relative;
         }
 
         .color-legend h3 {
-            color: #60a5fa;
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
+            color: #00f5ff;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
             text-align: center;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .legend-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 0.8rem;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            padding: 0.5rem;
-            background: rgba(15, 23, 42, 0.3);
-            border-radius: 8px;
-            transition: transform 0.2s ease;
+            gap: 1rem;
+            padding: 0.8rem;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s;
         }
 
         .legend-item:hover {
-            transform: translateX(5px);
+            transform: translateX(8px);
+            border-color: #00f5ff;
+            background: rgba(15, 23, 42, 0.8);
         }
 
         .color-box {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            width: 28px;
+            height: 28px;
+            border: 2px solid rgba(0, 245, 255, 0.5);
             flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+
+        .legend-item:hover .color-box {
+            transform: rotate(45deg);
         }
 
         .legend-item span:last-child {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #d1d5db;
+            font-weight: 500;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(59, 130, 246, 0.3);
+            z-index: 1000;
+        }
+
+        .status-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00f5ff, #3b82f6);
+            width: 0%;
+            transition: width 0.3s;
+            box-shadow: 0 0 10px #00f5ff;
+        }
+
+        @media (max-width: 768px) {
+            #canvas-container {
+                height: 350px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .social-links {
+                gap: 1rem;
+            }
+
+            .social-icon {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-progress"></div>
+    </div>
+
+    <!-- Background Effects -->
+    <div class="grid-background"></div>
+    <div class="circuit-lines">
+        <div class="circuit-line"></div>
+        <div class="circuit-line"></div>
+        <div class="circuit-line"></div>
+    </div>
+    <div class="particles" id="particles"></div>
+
     <div class="hero">
         <h1>Autonomous Funnel-Dispenser Rover</h1>
-        <p class="subtitle">An Arduino/ESP-Powered DIY Robotics Project</p>
-        <div id="canvas-container"></div>
+        <p class="subtitle">An Arduino/ESP-Powered Robotics Project</p>
+        <div id="canvas-container">
+            <div class="corner-bracket top-right"></div>
+            <div class="corner-bracket bottom-left"></div>
+            <div class="scan-line"></div>
+            <div class="hud-overlay">
+                <div class="hud-line">[ SYSTEM ACTIVE ]</div>
+                <div class="hud-line">[ 3D VIEW ]</div>
+                <div class="hud-line">[ ROTATION: ON ]</div>
+            </div>
+        </div>
         
         <div class="color-legend">
-            <h3>Component Color Guide</h3>
+            <h3>/// COMPONENT COLOR GUIDE ///</h3>
             <div class="legend-grid">
                 <div class="legend-item">
                     <span class="color-box" style="background: #f5f5f5;"></span>
@@ -398,17 +796,17 @@
     </div>
 
     <section id="overview">
-        <h2>Overview</h2>
+        <h2>/// Overview</h2>
         <p>
             The Autonomous Funnel-Dispenser Rover is a custom-built 4-wheel robotic platform designed for wireless operation 
-            and material dispensing applications. This DIY project combines Arduino/ESP microcontroller technology with 
+            and material dispensing applications. This project combines Arduino/ESP microcontroller technology with 
             mechanical design to create a versatile mobile platform. The integrated funnel mechanism allows for controlled 
             dispensing of materials while maintaining full mobility through its independent motor-driven wheels.
         </p>
     </section>
 
     <section id="hardware">
-        <h2>Hardware Components</h2>
+        <h2>/// Hardware Components</h2>
         <div class="details-grid">
             <div class="detail-card">
                 <h3>Microcontroller & Control</h3>
@@ -453,7 +851,7 @@
     </section>
 
     <section id="features">
-        <h2>Key Features</h2>
+        <h2>/// Key Features</h2>
         <div class="details-grid">
             <div class="detail-card">
                 <h3>🔌 Wireless Control</h3>
@@ -487,7 +885,7 @@
     </section>
 
     <section id="gallery">
-        <h2>Project Gallery</h2>
+        <h2>/// Project Gallery</h2>
         <div class="gallery">
             <div class="gallery-item"></div>
             <div class="gallery-item"></div>
@@ -501,249 +899,345 @@
         <div class="footer-content">
             <div class="social-links">
                 <div class="social-icon" title="YouTube">▶️</div>
-                <div class="social-icon" title="Facebook">f</div>
-                <div class="social-icon" title="Instagram">📷</div>
-                <div class="social-icon" title="Website">🌐</div>
-            </div>
-            <div class="credits">
-                <p><strong>JUST DO ELECTRONICS</strong></p>
-                <p>Arduino/ESP8266/ESP32/Raspberry Pi/Pic18/Arm</p>
-                <p style="margin-top: 1rem; opacity: 0.7;">© 2024 DIY Robotics Project. Built with passion for innovation.</p>
-            </div>
-        </div>
-    </footer>
+<div class="social-icon" title="Facebook">f</div>
+<div class="social-icon" title="Instagram">📷</div>
+<div class="social-icon" title="Website">🌐</div>
+</div>
+<div class="credits">
+<p><strong>Roots Of Hope</strong></p>
+<p>Arduino/ESP8266/ESP32/Raspberry Pi/Pic18/Arm</p>
+<p style="margin-top: 1rem; opacity: 0.7;">© 2024 EG Robotics Project. Built with passion for innovation.</p>
+</div>
+</div>
+</footer>
+<script>
+    // Create floating particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+        particlesContainer.appendChild(particle);
+    }
 
-    <script>
-        // Three.js Scene Setup
-        const container = document.getElementById('canvas-container');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    // Scroll progress bar
+    window.addEventListener('scroll', () => {
+        const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (window.scrollY / windowHeight) * 100;
+        document.querySelector('.status-progress').style.width = scrolled + '%';
+    });
+
+    // Three.js Scene Setup
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.setClearColor(0x000000, 1);
+    container.appendChild(renderer.domElement);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 10, 7);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+
+    const blueLight = new THREE.PointLight(0x00f5ff, 1.5);
+    blueLight.position.set(-5, 5, -5);
+    scene.add(blueLight);
+
+    const cyanLight = new THREE.PointLight(0x3b82f6, 1);
+    cyanLight.position.set(5, 3, 5);
+    scene.add(cyanLight);
+
+    // Robot Model
+    const robot = new THREE.Group();
+
+    // Chassis (lower platform)
+    const chassisGeometry = new THREE.BoxGeometry(4, 0.2, 3);
+    const chassisMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0xf5f5f5,
+        metalness: 0.3,
+        roughness: 0.7
+    });
+    const chassis = new THREE.Mesh(chassisGeometry, chassisMaterial);
+    chassis.castShadow = true;
+    chassis.position.y = 0.5;
+    robot.add(chassis);
+
+    // Connecting pipe
+    const pipeGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.7, 16);
+    const pipeMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x808080,
+        metalness: 0.6,
+        roughness: 0.4
+    });
+    const pipe = new THREE.Mesh(pipeGeometry, pipeMaterial);
+    pipe.position.set(0, 0.95, 0.5);
+    pipe.castShadow = true;
+    robot.add(pipe);
+
+    // Upper circular platform
+    const upperPlatformGeometry = new THREE.CylinderGeometry(0.65, 0.65, 0.15, 32);
+    const upperPlatformMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0xe8e8e8,
+        metalness: 0.4,
+        roughness: 0.6
+    });
+    const upperPlatform = new THREE.Mesh(upperPlatformGeometry, upperPlatformMaterial);
+    upperPlatform.position.set(0, 1.35, 0.5);
+    upperPlatform.castShadow = true;
+    robot.add(upperPlatform);
+
+    // Wheels with tires
+    const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 16);
+    const wheelMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0xffd700,
+        metalness: 0.5,
+        roughness: 0.5
+    });
+    
+    const tireGeometry = new THREE.TorusGeometry(0.4, 0.05, 8, 16);
+    const tireMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x1a1a1a,
+        roughness: 0.9
+    });
+    
+    const wheelPositions = [
+        [-1.5, 0.4, 1.2],
+        [1.5, 0.4, 1.2],
+        [-1.5, 0.4, -1.2],
+        [1.5, 0.4, -1.2]
+    ];
+
+    wheelPositions.forEach(pos => {
+        const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(pos[0], pos[1], pos[2]);
+        wheel.castShadow = true;
+        robot.add(wheel);
         
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.setClearColor(0x0a0e27, 1);
-        container.appendChild(renderer.domElement);
+        const tire = new THREE.Mesh(tireGeometry, tireMaterial);
+        tire.rotation.y = Math.PI / 2;
+        tire.position.set(pos[0], pos[1], pos[2]);
+        tire.castShadow = true;
+        robot.add(tire);
+    });
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
+    // Funnel
+    const funnelGeometry = new THREE.ConeGeometry(0.85, 1.8, 32);
+    const funnelMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0xfafafa,
+        metalness: 0.2,
+        roughness: 0.8
+    });
+    const funnel = new THREE.Mesh(funnelGeometry, funnelMaterial);
+    funnel.position.set(0, 2.3, 0.5);
+    funnel.rotation.x = Math.PI;
+    funnel.castShadow = true;
+    robot.add(funnel);
 
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        directionalLight.position.set(5, 10, 7);
-        directionalLight.castShadow = true;
-        scene.add(directionalLight);
+    // Electronics/Battery
+    const electronicsGeometry = new THREE.BoxGeometry(1.5, 0.6, 0.8);
+    const electronicsMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x2563eb,
+        metalness: 0.6,
+        roughness: 0.4
+    });
+    const electronics = new THREE.Mesh(electronicsGeometry, electronicsMaterial);
+    electronics.position.set(0, 0.9, -1);
+    electronics.castShadow = true;
+    robot.add(electronics);
 
-        const blueLight = new THREE.PointLight(0x3b82f6, 0.5);
-        blueLight.position.set(-5, 5, -5);
-        scene.add(blueLight);
+    // Motor Driver
+    const motorDriverGeometry = new THREE.BoxGeometry(0.8, 0.3, 0.6);
+    const motorDriverMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0xff4444,
+        metalness: 0.5,
+        roughness: 0.5
+    });
+    const motorDriver = new THREE.Mesh(motorDriverGeometry, motorDriverMaterial);
+    motorDriver.position.set(-0.8, 0.75, -0.8);
+    motorDriver.castShadow = true;
+    robot.add(motorDriver);
 
-        // Robot Model
-        const robot = new THREE.Group();
+    // ESP32 Module
+    const espGeometry = new THREE.BoxGeometry(0.5, 0.2, 0.4);
+    const espMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x1a1a1a,
+        metalness: 0.7,
+        roughness: 0.3
+    });
+    const espModule = new THREE.Mesh(espGeometry, espMaterial);
+    espModule.position.set(0.8, 0.75, -0.8);
+    espModule.castShadow = true;
+    robot.add(espModule);
 
-        // Chassis (lower platform)
-        const chassisGeometry = new THREE.BoxGeometry(4, 0.2, 3);
-        const chassisMaterial = new THREE.MeshStandardMaterial({ color: 0xf5f5f5 });
-        const chassis = new THREE.Mesh(chassisGeometry, chassisMaterial);
-        chassis.castShadow = true;
-        chassis.position.y = 0.5;
-        robot.add(chassis);
+    // Breadboard
+    const breadboardGeometry = new THREE.BoxGeometry(1.0, 0.15, 0.7);
+    const breadboardMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x22c55e,
+        metalness: 0.3,
+        roughness: 0.7
+    });
+    const breadboard = new THREE.Mesh(breadboardGeometry, breadboardMaterial);
+    breadboard.position.set(-0.5, 0.72, 0);
+    breadboard.castShadow = true;
+    robot.add(breadboard);
 
-        // Connecting pipe (thin cylinder joining chassis to upper platform)
-        const pipeGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.7, 16);
-        const pipeMaterial = new THREE.MeshStandardMaterial({ color: 0x808080 });
-        const pipe = new THREE.Mesh(pipeGeometry, pipeMaterial);
-        pipe.position.set(0, 0.95, 0.5);
-        pipe.castShadow = true;
-        robot.add(pipe);
+    // IMU Sensor
+    const imuGeometry = new THREE.BoxGeometry(0.3, 0.15, 0.3);
+    const imuMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x8b5cf6,
+        metalness: 0.6,
+        roughness: 0.4
+    });
+    const imu = new THREE.Mesh(imuGeometry, imuMaterial);
+    imu.position.set(0.6, 0.72, 0);
+    imu.castShadow = true;
+    robot.add(imu);
 
-        // Upper circular platform
-        const upperPlatformGeometry = new THREE.CylinderGeometry(0.65, 0.65, 0.15, 32);
-        const upperPlatformMaterial = new THREE.MeshStandardMaterial({ color: 0xe8e8e8 });
-        const upperPlatform = new THREE.Mesh(upperPlatformGeometry, upperPlatformMaterial);
-        upperPlatform.position.set(0, 1.35, 0.5);
-        upperPlatform.castShadow = true;
-        robot.add(upperPlatform);
+    // Wires
+    const wireMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0xff0000,
+        metalness: 0.8,
+        roughness: 0.2
+    });
+    const wireGeometry = new THREE.CylinderGeometry(0.03, 0.03, 0.8, 8);
+    
+    for (let i = 0; i < 3; i++) {
+        const wire = new THREE.Mesh(wireGeometry, wireMaterial);
+        wire.position.set(-0.3 + i * 0.3, 0.8, -0.5);
+        wire.rotation.x = Math.PI / 2;
+        robot.add(wire);
+    }
 
-        // Wheels with black rubber edges
-        const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 16);
-        const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700 });
-        
-        // Black tire/rim edge
-        const tireGeometry = new THREE.TorusGeometry(0.4, 0.05, 8, 16);
-        const tireMaterial = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
-        
-        const wheelPositions = [
-            [-1.5, 0.4, 1.2],
-            [1.5, 0.4, 1.2],
-            [-1.5, 0.4, -1.2],
-            [1.5, 0.4, -1.2]
-        ];
+    scene.add(robot);
 
-        wheelPositions.forEach(pos => {
-            const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-            wheel.rotation.z = Math.PI / 2;
-            wheel.position.set(pos[0], pos[1], pos[2]);
-            wheel.castShadow = true;
-            robot.add(wheel);
-            
-            // Add black tire edge
-            const tire = new THREE.Mesh(tireGeometry, tireMaterial);
-            tire.rotation.y = Math.PI / 2;
-            tire.position.set(pos[0], pos[1], pos[2]);
-            tire.castShadow = true;
-            robot.add(tire);
-        });
+    // Ground
+    const groundGeometry = new THREE.PlaneGeometry(20, 20);
+    const groundMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x0a0e27, 
+        roughness: 0.8,
+        metalness: 0.2
+    });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
 
-        // Funnel (upside down, positioned above upper platform)
-        const funnelGeometry = new THREE.ConeGeometry(0.85, 1.8, 32);
-        const funnelMaterial = new THREE.MeshStandardMaterial({ color: 0xfafafa });
-        const funnel = new THREE.Mesh(funnelGeometry, funnelMaterial);
-        funnel.position.set(0, 2.3, 0.5); // Above the upper platform
-        funnel.rotation.x = Math.PI; // Flip upside down
-        funnel.castShadow = true;
-        robot.add(funnel);
+    camera.position.set(5, 4, 8);
+    camera.lookAt(0, 1, 0);
 
-        // Electronics/Battery box (blue)
-        const electronicsGeometry = new THREE.BoxGeometry(1.5, 0.6, 0.8);
-        const electronicsMaterial = new THREE.MeshStandardMaterial({ color: 0x2563eb });
-        const electronics = new THREE.Mesh(electronicsGeometry, electronicsMaterial);
-        electronics.position.set(0, 0.9, -1);
-        electronics.castShadow = true;
-        robot.add(electronics);
+    // Mouse Interaction
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+    let targetRotation = { x: 0, y: 0 };
+    let currentRotation = { x: 0, y: 0 };
+    let autoRotate = true;
 
-        // Motor Driver (red/orange module)
-        const motorDriverGeometry = new THREE.BoxGeometry(0.8, 0.3, 0.6);
-        const motorDriverMaterial = new THREE.MeshStandardMaterial({ color: 0xff4444 });
-        const motorDriver = new THREE.Mesh(motorDriverGeometry, motorDriverMaterial);
-        motorDriver.position.set(-0.8, 0.75, -0.8);
-        motorDriver.castShadow = true;
-        robot.add(motorDriver);
+    container.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        autoRotate = false;
+    });
 
-        // ESP32/WiFi Module (small black chip)
-        const espGeometry = new THREE.BoxGeometry(0.5, 0.2, 0.4);
-        const espMaterial = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
-        const espModule = new THREE.Mesh(espGeometry, espMaterial);
-        espModule.position.set(0.8, 0.75, -0.8);
-        espModule.castShadow = true;
-        robot.add(espModule);
+    container.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const deltaMove = {
+                x: e.offsetX - previousMousePosition.x,
+                y: e.offsetY - previousMousePosition.y
+            };
+            targetRotation.y += deltaMove.x * 0.01;
+            targetRotation.x += deltaMove.y * 0.01;
+            targetRotation.x = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, targetRotation.x));
+        }
+        previousMousePosition = { x: e.offsetX, y: e.offsetY };
+    });
 
-        // Breadboard (green)
-        const breadboardGeometry = new THREE.BoxGeometry(1.0, 0.15, 0.7);
-        const breadboardMaterial = new THREE.MeshStandardMaterial({ color: 0x22c55e });
-        const breadboard = new THREE.Mesh(breadboardGeometry, breadboardMaterial);
-        breadboard.position.set(-0.5, 0.72, 0);
-        breadboard.castShadow = true;
-        robot.add(breadboard);
+    container.addEventListener('mouseup', () => {
+        isDragging = false;
+        setTimeout(() => { autoRotate = true; }, 3000);
+    });
 
-        // IMU Sensor (small purple/blue chip)
-        const imuGeometry = new THREE.BoxGeometry(0.3, 0.15, 0.3);
-        const imuMaterial = new THREE.MeshStandardMaterial({ color: 0x8b5cf6 });
-        const imu = new THREE.Mesh(imuGeometry, imuMaterial);
-        imu.position.set(0.6, 0.72, 0);
-        imu.castShadow = true;
-        robot.add(imu);
+    container.addEventListener('mouseleave', () => {
+        isDragging = false;
+    });
 
-        // Wires (red and black cables)
-        const wireMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-        const wireGeometry = new THREE.CylinderGeometry(0.03, 0.03, 0.8, 8);
-        
-        for (let i = 0; i < 3; i++) {
-            const wire = new THREE.Mesh(wireGeometry, wireMaterial);
-            wire.position.set(-0.3 + i * 0.3, 0.8, -0.5);
-            wire.rotation.x = Math.PI / 2;
-            robot.add(wire);
+    // Animation
+    function animate() {
+        requestAnimationFrame(animate);
+
+        if (autoRotate) {
+            targetRotation.y += 0.005;
         }
 
-        scene.add(robot);
+        currentRotation.x += (targetRotation.x - currentRotation.x) * 0.1;
+        currentRotation.y += (targetRotation.y - currentRotation.y) * 0.1;
 
-        // Ground
-        const groundGeometry = new THREE.PlaneGeometry(20, 20);
-        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x1a1f3a, roughness: 0.8 });
-        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-        ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
-        scene.add(ground);
+        robot.rotation.x = currentRotation.x;
+        robot.rotation.y = currentRotation.y;
 
-        camera.position.set(5, 4, 8);
-        camera.lookAt(0, 1, 0);
+        // Animate lights
+        blueLight.intensity = 1.5 + Math.sin(Date.now() * 0.001) * 0.5;
+        cyanLight.intensity = 1 + Math.cos(Date.now() * 0.0015) * 0.3;
 
-        // Mouse Interaction
-        let isDragging = false;
-        let previousMousePosition = { x: 0, y: 0 };
-        let targetRotation = { x: 0, y: 0 };
-        let currentRotation = { x: 0, y: 0 };
-        let autoRotate = true;
+        renderer.render(scene, camera);
+    }
+    animate();
 
-        container.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            autoRotate = false;
+    // Responsive
+    window.addEventListener('resize', () => {
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+    });
+
+    // GSAP Animations
+    gsap.registerPlugin(ScrollTrigger);
+
+    gsap.to('h1', { opacity: 1, y: 0, duration: 1.2, delay: 0.3, ease: 'power3.out' });
+    gsap.to('.subtitle', { opacity: 1, y: 0, duration: 1, delay: 0.6, ease: 'power3.out' });
+    gsap.to('#canvas-container', { opacity: 1, scale: 1, duration: 1.2, delay: 0.9, ease: 'back.out(1.2)' });
+    gsap.to('.color-legend', { opacity: 1, y: 0, duration: 1, delay: 1.2, ease: 'power3.out' });
+
+    // Scroll Animations
+    gsap.utils.toArray('section').forEach((section, i) => {
+        gsap.from(section, {
+            scrollTrigger: {
+                trigger: section,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 80,
+            duration: 1,
+            ease: 'power3.out'
         });
+    });
 
-        container.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                const deltaMove = {
-                    x: e.offsetX - previousMousePosition.x,
-                    y: e.offsetY - previousMousePosition.y
-                };
-                targetRotation.y += deltaMove.x * 0.01;
-                targetRotation.x += deltaMove.y * 0.01;
-                targetRotation.x = Math.max(-Math.PI / 4, Math.min(Math.PI / 4, targetRotation.x));
-            }
-            previousMousePosition = { x: e.offsetX, y: e.offsetY };
+    gsap.utils.toArray('.detail-card').forEach((card, i) => {
+        gsap.from(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 90%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 50,
+            duration: 0.8,
+            delay: i * 0.1,
+            ease: 'power2.out'
         });
-
-        container.addEventListener('mouseup', () => {
-            isDragging = false;
-            setTimeout(() => { autoRotate = true; }, 3000);
-        });
-
-        // Animation
-        function animate() {
-            requestAnimationFrame(animate);
-
-            if (autoRotate) {
-                targetRotation.y += 0.005;
-            }
-
-            currentRotation.x += (targetRotation.x - currentRotation.x) * 0.1;
-            currentRotation.y += (targetRotation.y - currentRotation.y) * 0.1;
-
-            robot.rotation.x = currentRotation.x;
-            robot.rotation.y = currentRotation.y;
-
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // Responsive
-        window.addEventListener('resize', () => {
-            const width = container.clientWidth;
-            const height = container.clientHeight;
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
-        });
-
-        // GSAP Animations
-        gsap.to('h1', { opacity: 1, y: 0, duration: 1, delay: 0.2 });
-        gsap.to('.subtitle', { opacity: 1, y: 0, duration: 1, delay: 0.4 });
-        gsap.to('#canvas-container', { opacity: 1, scale: 1, duration: 1, delay: 0.6 });
-
-        // Scroll Animations
-        gsap.utils.toArray('section').forEach((section, i) => {
-            gsap.from(section, {
-                scrollTrigger: {
-                    trigger: section,
-                    start: 'top 80%',
-                    toggleActions: 'play none none reverse'
-                },
-                opacity: 0,
-                y: 50,
-                duration: 0.8,
-                delay: i * 0.1
-            });
-        });
-    </script>
+    });
+</script>
 </body>
 </html>
